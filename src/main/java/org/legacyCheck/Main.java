@@ -5,7 +5,6 @@ import org.legacyCheck.config.SSLUtils;
 import org.legacyCheck.pdf.PDFGenerator;
 import org.legacyCheck.reader.CobolFileReader;
 import org.legacyCheck.reader.TxtFileReader;
-import org.legacyCheck.service.OpenAIService;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -17,7 +16,7 @@ public class Main {
         SSLUtils.disableSSLValidation();
 
         // Lê os arquivos COBOL do diretório especificado
-        List<Path> files = new CobolFileReader().getCobolFiles(BaseConfig.Path_TO_COBOL_FILES);
+        //List<Path> files = new CobolFileReader().getCobolFiles(BaseConfig.Path_TO_COBOL_FILES);
 
         // Lê os arquivos TXT do diretório especificado
         List<Path> txtFiles = new TxtFileReader().getTxtFiles(BaseConfig.TxtPath);
@@ -28,7 +27,8 @@ public class Main {
             System.out.println("Analisando arquivo: " + txtfile.getFileName());
 
             PDFGenerator pdfGenerator = new PDFGenerator();
-            pdfGenerator.generatePDF(content,BaseConfig.TxtPath + txtfile.getFileName() + ".pdf");
+            pdfGenerator.generatePDF(content, BaseConfig.TxtPath +
+                    txtfile.getFileName().toString().replace(".txt", "") + ".pdf");
 
             // Envia o conteúdo para a IA
 //            String review = OpenAIService.analyzeCode(content);
