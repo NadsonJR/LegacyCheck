@@ -34,5 +34,4 @@ public class CobolFileReader {
             throw new RuntimeException(e);
         }
     }
-
 }
