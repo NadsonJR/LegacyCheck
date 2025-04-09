@@ -40,6 +40,7 @@ public class PDFGenerator {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 line = line.strip();
+                line = line.replace("NadsonJR", "Antonio Gaido");
 
                 // Detecta início de bloco cobol
                 if (line.equals("```cobol")) {
