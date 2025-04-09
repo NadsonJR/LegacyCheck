@@ -2,7 +2,9 @@ package org.legacyCheck;
 
 import org.legacyCheck.config.BaseConfig;
 import org.legacyCheck.config.SSLUtils;
+import org.legacyCheck.pdf.PDFGenerator;
 import org.legacyCheck.reader.CobolFileReader;
+import org.legacyCheck.reader.TxtFileReader;
 import org.legacyCheck.service.OpenAIService;
 
 import java.nio.file.Path;
@@ -10,17 +12,37 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+
         // Desativa a validação SSL
         SSLUtils.disableSSLValidation();
-        // Verifica se a chave da OpenAI está presente
+
+        // Lê os arquivos COBOL do diretório especificado
         List<Path> files = new CobolFileReader().getCobolFiles(BaseConfig.Path_TO_COBOL_FILES);
-        for (Path file : files) {
-            // Lê o conteúdo do arquivo COBOL
-            String content = new CobolFileReader().readContent(file);
-            System.out.println("Analisando arquivo: " + file.getFileName());
+
+        // Lê os arquivos TXT do diretório especificado
+        List<Path> txtFiles = new TxtFileReader().getTxtFiles(BaseConfig.TxtPath);
+
+        for (Path txtfile : txtFiles) {
+            // Lê o conteúdo do arquivo TXT
+            String content = new TxtFileReader().readContent(txtfile);
+            System.out.println("Analisando arquivo: " + txtfile.getFileName());
+
+            PDFGenerator pdfGenerator = new PDFGenerator();
+            pdfGenerator.generatePDF(content,BaseConfig.TxtPath + txtfile.getFileName() + ".pdf");
+
             // Envia o conteúdo para a IA
-            String review = OpenAIService.analyzeCode(content);
-            System.out.println("Resposta da IA: " + review);
+//            String review = OpenAIService.analyzeCode(content);
+//            System.out.println("Resposta da IA: " + review);
         }
+
+//        for (Path file : files) {
+//            // Lê o conteúdo do arquivo COBOL
+//            String content = new CobolFileReader().readContent(file);
+//            System.out.println("Analisando arquivo: " + file.getFileName());
+//
+//            // Envia o conteúdo para a IA
+//            String review = OpenAIService.analyzeCode(content);
+//            System.out.println("Resposta da IA: " + review);
+//        }
     }
 }

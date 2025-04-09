@@ -10,11 +10,12 @@
 
     <name>LegacyCheck</name>
     <dependencies>
-        <!-- PDFBox -->
+        <!-- PDF -->
         <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.4</version>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>9.1.0</version>
+            <type>pom</type>
         </dependency>
         <!-- HTTP Client (OpenAI Client)-->
         <dependency>
