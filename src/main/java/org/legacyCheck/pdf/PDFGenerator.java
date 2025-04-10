@@ -9,10 +9,14 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.BorderRadius;
+import com.itextpdf.layout.properties.UnitValue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,9 +26,22 @@ public class PDFGenerator {
 
     // Method to generate a PDF file from the given content
 
-    public void generatePDF(String content, String outputPath) {
+    public void generatePDF(String content, String outputPath, String fileName) {
         try {
-            PdfWriter writer = new PdfWriter(outputPath);
+
+            // Define directory for output
+            String outputDirectory = "src/main/resources/ReponsePrompts/PDFs";
+            File directory = new File(outputDirectory);
+
+            // Create the directory if it doesn't exist
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            //Adjust the file path to include the output folder
+            String outputFilePath = outputDirectory + "/" + fileName + ".pdf";
+
+            PdfWriter writer = new PdfWriter(outputFilePath);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
@@ -36,6 +53,8 @@ public class PDFGenerator {
             boolean inCobolBlock = false;
             StringBuilder cobolCode = new StringBuilder();
             String currentAuthor = "";
+            boolean inTable = false;
+            Table table = null;
 
             String[] lines = content.split("\n");
             for (String line : lines) {
@@ -46,6 +65,34 @@ public class PDFGenerator {
                 if (line.equals("```cobol")) {
                     inCobolBlock = true;
                     cobolCode = new StringBuilder();
+                    continue;
+                }
+
+                // Detecta início da tabela
+                if (line.startsWith("|") && !inTable) {
+                    inTable = true;
+                    table = new Table(new float[]{2, 5, 5}); // Define largura das colunas
+                    table.setWidth(UnitValue.createPercentValue(100));
+                    continue;
+                }
+
+                // Detecta fim da tabela
+                if (inTable && (line.isEmpty() || !line.startsWith("|"))) {
+                    inTable = false;
+                    document.add(table);
+                    table = null;
+                }
+
+                // Processa linhas da tabela
+                if (inTable) {
+                    String[] cells = line.split("\\|");
+                    for (String cell : cells) {
+                        if (!cell.isBlank()) {
+                            table.addCell(new Cell().add(new Paragraph(cell.strip()))
+                                    .setBackgroundColor(new DeviceRgb(240, 240, 240))
+                                    .setPadding(5));
+                        }
+                    }
                     continue;
                 }
 
@@ -112,7 +159,6 @@ public class PDFGenerator {
                     document.add(formatParagraphWithHighlights(line));
                 }
             }
-
             document.close();
         } catch (Exception e) {
             System.out.println("Erro ao gerar PDF: " + e.getMessage());

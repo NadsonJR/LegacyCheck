@@ -27,8 +27,8 @@ public class Main {
             System.out.println("Analisando arquivo: " + txtfile.getFileName());
 
             PDFGenerator pdfGenerator = new PDFGenerator();
-            pdfGenerator.generatePDF(content, BaseConfig.TxtPath +
-                    txtfile.getFileName().toString().replace(".txt", "") + ".pdf");
+            String PdfFile = txtfile.getFileName().toString().replace(".txt", "");
+            pdfGenerator.generatePDF(content, BaseConfig.TxtPath + PdfFile + ".pdf",PdfFile);
 
             // Envia o conteúdo para a IA
 //            String review = OpenAIService.analyzeCode(content);
