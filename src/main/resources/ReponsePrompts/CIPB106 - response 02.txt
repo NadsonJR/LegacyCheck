@@ -1,9 +1,7 @@
+
 GitHub Copilot: ### **Code Review entre os arquivos [CIPB106 - F1rst.CBL] e [cipb106 - Eccox.CBL]**
 
----
-
 #### **1. Diferenças Gerais**
-
 - O arquivo `cipb106 - Eccox.CBL` contém marcações específicas da Eccox (`Eccox *`) indicando alterações ou comentários adicionais.
 - O arquivo `CIPB106 - F1rst.CBL` parece ser a versão original ou uma versão anterior do programa.
 - A Eccox adicionou lógica para manipulação de SQL (`EXEC SQL`) e tratamento de `SQLCODE`, enquanto o arquivo original utiliza apenas operações de leitura VSAM.
@@ -11,8 +9,6 @@ GitHub Copilot: ### **Code Review entre os arquivos [CIPB106 - F1rst.CBL] e [cip
 ---
 
 #### **2. Erros e Redundâncias no arquivo [cipb106 - Eccox.CBL]**
-
----
 
 ##### **Linha 00460000 a 00510000**
 ```cobol
