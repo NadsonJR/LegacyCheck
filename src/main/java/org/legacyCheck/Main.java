@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
 
         // Desativa a validação SSL
-        SSLUtils.disableSSLValidation();
+        //SSLUtils.disableSSLValidation();
 
         // Lê os arquivos COBOL do diretório especificado
         //List<Path> files = new CobolFileReader().getCobolFiles(BaseConfig.Path_TO_COBOL_FILES);
