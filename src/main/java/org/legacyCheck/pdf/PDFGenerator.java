@@ -23,9 +23,7 @@ import java.util.regex.Pattern;
 
 
 public class PDFGenerator {
-
     // Method to generate a PDF file from the given content
-
     public void generatePDF(String content, String outputPath, String fileName) {
         try {
 
@@ -61,14 +59,14 @@ public class PDFGenerator {
                 line = line.strip();
                 line = line.replace("NadsonJR", "Antonio Gaido");
 
-                // Detecta início de bloco cobol
+                // Detect the start of a COBOL block
                 if (line.equals("```cobol")) {
                     inCobolBlock = true;
                     cobolCode = new StringBuilder();
                     continue;
                 }
 
-                // Detecta início da tabela
+                // Detect the start of a table
                 if (line.startsWith("|") && !inTable) {
                     inTable = true;
                     table = new Table(new float[]{2, 5, 5}); // Define largura das colunas
@@ -76,14 +74,14 @@ public class PDFGenerator {
                     continue;
                 }
 
-                // Detecta fim da tabela
+                // Detect the end of a table
                 if (inTable && (line.isEmpty() || !line.startsWith("|"))) {
                     inTable = false;
                     document.add(table);
                     table = null;
                 }
 
-                // Processa linhas da tabela
+                // Process table rows
                 if (inTable) {
                     String[] cells = line.split("\\|");
                     for (String cell : cells) {
@@ -96,7 +94,7 @@ public class PDFGenerator {
                     continue;
                 }
 
-                // Detecta fim de bloco cobol
+                // Detect the end of a COBOL block
                 if (line.equals("```") && inCobolBlock) {
                     inCobolBlock = false;
                     document.add(formatCobolCodeBlock(cobolCode.toString()));
@@ -108,7 +106,7 @@ public class PDFGenerator {
                 }
 
                 if (line.equals("---")) {
-                   line.replace("---", "");
+                    line.replace("---", "");
                     continue;
                 }
 
@@ -130,30 +128,30 @@ public class PDFGenerator {
                     continue;
                 }
 
-                // Títulos e conteúdo
+                // Titles and content
                 if (line.matches("^#{3,}\\s+.*")) {
-                    // ### ou mais — título pequeno
+                    // ### or more — small title
                     document.add(new Paragraph(line.replaceFirst("^#{3,}\\s*", ""))
                             .setFontSize(13)
                             .setFontColor(new DeviceRgb(0, 128, 255))
                             .setMarginTop(10)
                             .setNeutralRole().simulateBold());
                 } else if (line.matches("^##\\s+.*")) {
-                    // ## — subtítulo médio
+                    // ## — subtitle medium
                     document.add(new Paragraph(line.replaceFirst("^##\\s*", ""))
                             .setFontSize(15)
                             .setFontColor(new DeviceRgb(0, 80, 180))
                             .setMarginTop(15)
                             .setNeutralRole().simulateBold());
                 } else if (line.matches("^#\\s+.*")) {
-                    // # — título principal
+                    // # — main title
                     document.add(new Paragraph(line.replaceFirst("^#\\s*", ""))
                             .setFontSize(18)
                             .setFontColor(new DeviceRgb(0, 50, 130))
                             .setMarginTop(20)
                             .setMarginBottom(10)
                             .setNeutralRole().simulateBold());
-                }  else if (line.isEmpty()) {
+                } else if (line.isEmpty()) {
                     document.add(new Paragraph(" "));
                 } else {
                     document.add(formatParagraphWithHighlights(line));
@@ -165,12 +163,11 @@ public class PDFGenerator {
         }
     }
 
-    // Realça palavras entre crase `...` com cor verde
+    // Highlights words between crase `...` with green color
     private Paragraph formatParagraphWithHighlights(String line) {
         Paragraph paragraph = new Paragraph();
         Pattern pattern = Pattern.compile("`([^`]+)`");
         Matcher matcher = pattern.matcher(line);
-
         int lastEnd = 0;
         while (matcher.find()) {
             String before = line.substring(lastEnd, matcher.start());
@@ -182,15 +179,13 @@ public class PDFGenerator {
                     .setNeutralRole().simulateBold());
             lastEnd = matcher.end();
         }
-
         if (lastEnd < line.length()) {
             paragraph.add(new Text(line.substring(lastEnd)));
         }
-
         return paragraph;
     }
 
-    // Formata bloco cobol com sintaxe colorida
+    // Format cobol block with syntax coloring
     private Paragraph formatCobolCodeBlock(String code) throws IOException {
         Paragraph paragraph = new Paragraph()
                 .setFont(PdfFontFactory.createFont(StandardFonts.COURIER))

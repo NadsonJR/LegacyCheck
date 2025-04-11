@@ -3,6 +3,7 @@ package org.legacyCheck;
 import org.legacyCheck.config.BaseConfig;
 import org.legacyCheck.config.SSLUtils;
 import org.legacyCheck.pdf.PDFGenerator;
+import org.legacyCheck.pdf.PDFGeneratorBOX;
 import org.legacyCheck.reader.CobolFileReader;
 import org.legacyCheck.reader.TxtFileReader;
 
@@ -25,11 +26,11 @@ public class Main {
             // Lê o conteúdo do arquivo TXT
             String content = new TxtFileReader().readContent(txtfile);
             System.out.println("Analisando arquivo: " + txtfile.getFileName());
-
             PDFGenerator pdfGenerator = new PDFGenerator();
+            PDFGeneratorBOX pdfGeneratorBOX = new PDFGeneratorBOX();
             String PdfFile = txtfile.getFileName().toString().replace(".txt", "");
-            pdfGenerator.generatePDF(content, BaseConfig.TxtPath + PdfFile + ".pdf",PdfFile);
-
+            //pdfGenerator.generatePDF(content, BaseConfig.TxtPath + PdfFile + ".pdf",PdfFile);
+            pdfGeneratorBOX.generatePDF(content, BaseConfig.TxtPath + PdfFile,PdfFile);
             // Envia o conteúdo para a IA
 //            String review = OpenAIService.analyzeCode(content);
 //            System.out.println("Resposta da IA: " + review);
