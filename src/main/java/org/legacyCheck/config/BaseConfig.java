@@ -7,4 +7,5 @@ public class BaseConfig {
     public static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     public static final String OPENAI_MODEL = "gpt-4.0";
     public static final String TxtPath = "src/main/resources/ReponsePrompts/";
+    public static final String PDFPath = "src/main/resources/ReponsePrompts/PDFs";
 }

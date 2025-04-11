@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class PDFGeneratorBOX {
 
     private static final float MARGIN = 50;
-    private static final float Y_START = 750;
+    private static final float Y_START = 800;
     private float yPosition = Y_START;
     private PDPage currentPage;
     private PDPageContentStream contentStream;
@@ -33,8 +33,7 @@ public class PDFGeneratorBOX {
     public void generatePDF(String content, String outputPath, String fileName) {
         try {
             // Define directory for output
-            String outputDirectory = "src/main/resources/ReponsePrompts/PDFs";
-            File directory = new File(outputDirectory);
+            File directory = new File(outputPath);
 
             // Create the directory if it doesn't exist
             if (!directory.exists()) {
@@ -42,7 +41,7 @@ public class PDFGeneratorBOX {
             }
 
             //Adjust the file path to include the output folder
-            String outputFilePath = outputDirectory + "/" + fileName + ".pdf";
+            String outputFilePath = outputPath + "/" + fileName + ".pdf";
 
             // Initialize document and font
             document = new PDDocument();
@@ -168,7 +167,6 @@ public class PDFGeneratorBOX {
 
     private void drawAuthorHeader(String author, Color bgColor) throws IOException {
         float height = 25;
-        movePosition(10); // margin top
         // Draw background
         contentStream.setNonStrokingColor(bgColor);
         contentStream.addRect(MARGIN, yPosition - height, PDRectangle.A4.getWidth() - 2 * MARGIN, height);
