@@ -1,20 +1,26 @@
 package org.legacyCheck;
 
 import org.legacyCheck.config.BaseConfig;
+import org.legacyCheck.handler.cobolHandler;
 import org.legacyCheck.pdf.PDFGeneratorBOX;
+import org.legacyCheck.reader.CobolFileReader;
 import org.legacyCheck.reader.TxtFileReader;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         // Desativa a validação SSL
         //SSLUtils.disableSSLValidation();
 
         // Lê os arquivos COBOL do diretório especificado
         //List<Path> files = new CobolFileReader().getCobolFiles(BaseConfig.Path_TO_COBOL_FILES);
+
+//        cobolHandler cobolHandler = new cobolHandler();
+//        cobolHandler.splitCobolFilesV3(BaseConfig.OutputCobolSplitFiles, files, 4800);
 
         // Lê os arquivos TXT do diretório especificado
         List<Path> txtFiles = new TxtFileReader().getTxtFiles(BaseConfig.TxtPath);

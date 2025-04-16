@@ -64,10 +64,10 @@ public class PDFGeneratorBOX {
             String[] lines = content.split("\n");
             for (String line : lines) {
                 line = line.strip();
-                line = line.replace("NadsonJR", "Antonio Gaido");
+                line = line.replace("GitHub Copilot: ", "");
 
                 // Detect the start of a COBOL block
-                if (line.equals("```cobol")) {
+                if (line.equalsIgnoreCase("```cobol")) {
                     inCobolBlock = true;
                     cobolCode = new StringBuilder();
                     continue;
@@ -114,15 +114,9 @@ public class PDFGeneratorBOX {
                 if (line.equals("---")) {
                     continue;
                 }
-                // Autores
-                if (line.endsWith(":")) {
-                    currentAuthor = line.replace(":", "").trim();
-                    Color bgColor = currentAuthor.equalsIgnoreCase("GitHub Copilot")
-                            ? Color.LIGHT_GRAY
-                            : new Color(220, 240, 255);
 
-                    drawAuthorHeader(currentAuthor, bgColor);
-                    continue;
+                if(line.contains("*")){
+                    line = line.replace("*", "");
                 }
                 // Titles and content
                 if (line.matches("^#{3,}\\s+.*")) {
@@ -165,24 +159,9 @@ public class PDFGeneratorBOX {
         }
     }
 
-    private void drawAuthorHeader(String author, Color bgColor) throws IOException {
-        float height = 25;
-        // Draw background
-        contentStream.setNonStrokingColor(bgColor);
-        contentStream.addRect(MARGIN, yPosition - height, PDRectangle.A4.getWidth() - 2 * MARGIN, height);
-        contentStream.fill();
-        // Draw text
-        contentStream.beginText();
-        contentStream.setFont(boldFont, 12);
-        contentStream.setNonStrokingColor(Color.BLACK);
-        contentStream.newLineAtOffset(MARGIN + 5, yPosition - 15);
-        contentStream.showText(author);
-        contentStream.endText();
-        movePosition(height + 5); // + margin bottom
-    }
-
     private void drawTitle(String text, float size, Color color) throws IOException {
         movePosition(size * 1.2f); // margin top
+        text = text.replace("**", "");
         contentStream.beginText();
         contentStream.setFont(boldFont, size);
         contentStream.setNonStrokingColor(color);
@@ -204,13 +183,54 @@ public class PDFGeneratorBOX {
             if (!before.isEmpty()) {
                 parts.add(new TextPart(before, false));
             }
-            String highlighted = matcher.group(1);
+            String highlighted = " " + matcher.group(1);
             parts.add(new TextPart(highlighted, true));
             lastEnd = matcher.end();
         }
         if (lastEnd < line.length()) {
             parts.add(new TextPart(line.substring(lastEnd), false));
         }
+
+        // Detect and color the word "Solução"
+        for (int i = 0; i < parts.size(); i++) {
+            TextPart part = parts.get(i);
+            if (part.text.contains("Erro:")) {
+                String[] split = part.text.split("Erro:", -1);
+                List<TextPart> newParts = new ArrayList<>();
+                for (int j = 0; j < split.length; j++) {
+                    if (!split[j].isEmpty()) {
+                        newParts.add(new TextPart(split[j], false));
+                    }
+                    if (j < split.length - 1) {
+                        newParts.add(new TextPart("Erro:", true)); // Highlight "Erro"
+                    }
+                }
+                parts.remove(i);
+                parts.addAll(i, newParts);
+                break;
+            }
+        }
+
+        // Detect and color the word "Solução"
+        for (int i = 0; i < parts.size(); i++) {
+            TextPart part = parts.get(i);
+            if (part.text.contains("Solução:")) {
+                String[] split = part.text.split("Solução:", -1);
+                List<TextPart> newParts = new ArrayList<>();
+                for (int j = 0; j < split.length; j++) {
+                    if (!split[j].isEmpty()) {
+                        newParts.add(new TextPart(split[j], false));
+                    }
+                    if (j < split.length - 1) {
+                        newParts.add(new TextPart("Solução:", true)); // Highlight "Solução"
+                    }
+                }
+                parts.remove(i);
+                parts.addAll(i, newParts);
+                break;
+            }
+        }
+
         // Calculate line breaks
         List<List<TextPart>> lines = new ArrayList<>();
         List<TextPart> currentLine = new ArrayList<>();
@@ -245,8 +265,16 @@ public class PDFGeneratorBOX {
             float xOffset = MARGIN;
             for (TextPart part : textLine) {
                 contentStream.beginText();
-                contentStream.setFont(part.isHighlighted ? codeFont : basicFont, fontSize);
-                contentStream.setNonStrokingColor(part.isHighlighted ? new Color(0, 150, 0) : Color.BLACK);
+                if(part.text.equals("Solução:")){
+                    contentStream.setFont(part.isHighlighted ? boldFont : basicFont, fontSize);
+                    contentStream.setNonStrokingColor(part.isHighlighted ? new Color(0, 150, 0) : Color.BLACK);
+                } else if (part.text.equals("Erro:")) {
+                    contentStream.setFont(part.isHighlighted ? boldFont : basicFont, fontSize);
+                    contentStream.setNonStrokingColor(part.isHighlighted ? new Color(255, 0, 0) : Color.BLACK);
+                } else {
+                    contentStream.setFont(part.isHighlighted ? codeFont : basicFont, fontSize);
+                    contentStream.setNonStrokingColor(part.isHighlighted ? new Color(0, 0, 150) : Color.BLACK);
+                }
                 contentStream.newLineAtOffset(xOffset, yPosition);
                 contentStream.showText(part.text);
                 contentStream.endText();
@@ -312,60 +340,99 @@ public class PDFGeneratorBOX {
     private void drawTable(List<String[]> tableData, float[] columnWidths) throws IOException {
         if (tableData == null || tableData.isEmpty()) return;
 
-        // Calculate total width based on page width
         float tableWidth = PDRectangle.A4.getWidth() - 2 * MARGIN;
-        float rowHeight = 20;
-        float tableHeight = tableData.size() * rowHeight;
+        float y = yPosition;
 
-        // Check if we need a new page
-        if (yPosition - tableHeight < MARGIN) {
-            contentStream.close();
-            currentPage = new PDPage(PDRectangle.A4);
-            document.addPage(currentPage);
-            contentStream = new PDPageContentStream(document, currentPage);
-            yPosition = Y_START;
-        }
-
-        // Calculate column widths
+        // Calculate the actual column widths
         float[] actualColumnWidths = new float[columnWidths.length];
-        float sum = 0;
+        float totalWidthRatio = 0;
         for (float width : columnWidths) {
-            sum += width;
+            totalWidthRatio += width;
         }
         for (int i = 0; i < columnWidths.length; i++) {
-            actualColumnWidths[i] = (columnWidths[i] / sum) * tableWidth;
+            actualColumnWidths[i] = (columnWidths[i] / totalWidthRatio) * tableWidth;
         }
-        // Draw table
-        float y = yPosition;
+
         for (String[] row : tableData) {
-            float x = MARGIN;
-            // Draw cell backgrounds
+            float maxRowHeight = 0; // Maximum row height
+            List<List<String>> wrappedText = new ArrayList<>();
+
+            // Wrap text for each cell and calculate row height
             for (int i = 0; i < actualColumnWidths.length && i < row.length; i++) {
-                contentStream.setNonStrokingColor(new Color(240, 240, 240));
-                contentStream.addRect(x, y - rowHeight, actualColumnWidths[i], rowHeight);
+                float cellWidth = actualColumnWidths[i] - 10; // Account for padding
+                List<String> lines = wrapText(row[i], cellWidth, basicFont, fontSize);
+                wrappedText.add(lines);
+                maxRowHeight = Math.max(maxRowHeight, lines.size() * leading);
+            }
+
+            // Check if a new page is needed
+            if (y - maxRowHeight < MARGIN) {
+                contentStream.close();
+                currentPage = new PDPage(PDRectangle.A4);
+                document.addPage(currentPage);
+                contentStream = new PDPageContentStream(document, currentPage);
+                y = Y_START;
+            }
+
+            // Draw cell backgrounds and borders
+            float x = MARGIN;
+            for (int i = 0; i < actualColumnWidths.length && i < row.length; i++) {
+                contentStream.setNonStrokingColor(new Color(240, 240, 240)); // Background color
+                contentStream.addRect(x, y - maxRowHeight, actualColumnWidths[i], maxRowHeight);
                 contentStream.fill();
-                contentStream.setStrokingColor(Color.LIGHT_GRAY);
+                contentStream.setStrokingColor(Color.LIGHT_GRAY); // Border color
                 contentStream.setLineWidth(0.5f);
-                contentStream.addRect(x, y - rowHeight, actualColumnWidths[i], rowHeight);
+                contentStream.addRect(x, y - maxRowHeight, actualColumnWidths[i], maxRowHeight);
                 contentStream.stroke();
                 x += actualColumnWidths[i];
             }
+
             // Draw cell text
             x = MARGIN;
             for (int i = 0; i < actualColumnWidths.length && i < row.length; i++) {
-                contentStream.beginText();
-                contentStream.setFont(basicFont, 9);
-                contentStream.setNonStrokingColor(Color.BLACK);
-                contentStream.newLineAtOffset(x + 5, y - rowHeight + 7); // Add some padding
-                contentStream.showText(row[i]);
-                contentStream.endText();
+                List<String> lines = wrappedText.get(i);
+                float textHeight = lines.size() * leading; // Total text height
+                float textY = 5 + y - (maxRowHeight - textHeight) / 2 - leading; // Center text vertically
+
+                for (String line : lines) {
+                    contentStream.beginText();
+                    contentStream.setFont(basicFont, fontSize);
+                    contentStream.setNonStrokingColor(Color.BLACK);
+                    contentStream.newLineAtOffset(x + 5, textY); // Add horizontal padding
+                    contentStream.showText(line);
+                    contentStream.endText();
+                    textY -= leading; // Move to the next line
+                }
                 x += actualColumnWidths[i];
             }
-
-            y -= rowHeight;
+            y -= maxRowHeight; // Move to the next row
         }
-        yPosition = y;
+        yPosition = y; // Update vertical position
     }
+
+    private List<String> wrapText(String text, float maxWidth, PDFont font, float fontSize) throws IOException {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            float textWidth = font.getStringWidth(testLine) / 1000 * fontSize;
+            if (textWidth > maxWidth) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder(word);
+            } else {
+                currentLine.append(currentLine.length() == 0 ? word : " " + word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
+    }
+
 
     private float getStringWidth(String text, PDFont font, float fontSize) throws IOException {
         return font.getStringWidth(text) / 1000 * fontSize;
