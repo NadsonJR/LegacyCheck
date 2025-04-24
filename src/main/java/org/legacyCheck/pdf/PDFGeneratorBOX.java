@@ -31,6 +31,11 @@ public class PDFGeneratorBOX {
 
     // Method to generate a PDF file from the given content
     public void generatePDF(String content, String outputPath, String fileName) {
+        // Verificar se o conteúdo está vazio
+        if (content == null || content.trim().isEmpty()) {
+            System.out.println("Conteúdo vazio. PDF não será gerado.");
+            return;
+        }
         try {
             // Define directory for output
             File directory = new File(outputPath);
@@ -121,13 +126,13 @@ public class PDFGeneratorBOX {
                 // Titles and content
                 if (line.matches("^#{3,}\\s+.*")) {
                     // ### or more — small title
-                    drawTitle(line.replaceFirst("^#{3,}\\s*", ""), 13, new Color(0, 128, 255));
+                    drawTitle(line.replaceFirst("^#{3,}\\s*", ""), 12, new Color(0, 128, 255));
                 } else if (line.matches("^##\\s+.*")) {
                     // ## — subtitle medium
-                    drawTitle(line.replaceFirst("^##\\s*", ""), 15, new Color(0, 80, 180));
+                    drawTitle(line.replaceFirst("^##\\s*", ""), 14, new Color(0, 80, 180));
                 } else if (line.matches("^#\\s+.*")) {
                     // # — main title
-                    drawTitle(line.replaceFirst("^#\\s*", ""), 18, new Color(0, 50, 130));
+                    drawTitle(line.replaceFirst("^#\\s*", ""), 16, new Color(0, 50, 130));
                 } else if (line.isEmpty()) {
                     movePosition(leading);
                 } else {
@@ -191,7 +196,7 @@ public class PDFGeneratorBOX {
             parts.add(new TextPart(line.substring(lastEnd), false));
         }
 
-        // Detect and color the word "Solução"
+        // Detect and color the word "Erro"
         for (int i = 0; i < parts.size(); i++) {
             TextPart part = parts.get(i);
             if (part.text.contains("Erro:")) {
@@ -203,6 +208,21 @@ public class PDFGeneratorBOX {
                     }
                     if (j < split.length - 1) {
                         newParts.add(new TextPart("Erro:", true)); // Highlight "Erro"
+                    }
+                }
+                parts.remove(i);
+                parts.addAll(i, newParts);
+                break;
+            }
+            if (part.text.contains("Problema:")) {
+                String[] split = part.text.split("Problema:", -1);
+                List<TextPart> newParts = new ArrayList<>();
+                for (int j = 0; j < split.length; j++) {
+                    if (!split[j].isEmpty()) {
+                        newParts.add(new TextPart(split[j], false));
+                    }
+                    if (j < split.length - 1) {
+                        newParts.add(new TextPart("Problema:", true)); // Highlight "Erro"
                     }
                 }
                 parts.remove(i);
@@ -268,7 +288,7 @@ public class PDFGeneratorBOX {
                 if(part.text.equals("Solução:")){
                     contentStream.setFont(part.isHighlighted ? boldFont : basicFont, fontSize);
                     contentStream.setNonStrokingColor(part.isHighlighted ? new Color(0, 150, 0) : Color.BLACK);
-                } else if (part.text.equals("Erro:")) {
+                } else if (part.text.equals("Erro:") || part.text.equals("Problema:")) {
                     contentStream.setFont(part.isHighlighted ? boldFont : basicFont, fontSize);
                     contentStream.setNonStrokingColor(part.isHighlighted ? new Color(255, 0, 0) : Color.BLACK);
                 } else {

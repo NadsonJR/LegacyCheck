@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class cobolHandler {
 
@@ -43,7 +45,6 @@ public class cobolHandler {
             }
         }
     }
-
 
     // criar criteiros para filtros de section e dentro do filtro verificar o eccox
     public void splitCobolFilesV3(String outputFilePath, List<Path> cobolFiles, int linesPerFile) throws IOException {
@@ -106,4 +107,45 @@ public class cobolHandler {
             }
         }
     }
+
+    public void calculateTokensForDirectory(String directoryPath) throws IOException {
+        int mediaTotal = 0;
+        int contatorArquivo = 0;
+        int arquivoDona = 0;
+        try (Stream<Path> files = Files.list(Paths.get(directoryPath))) {
+            for (Path cobolFile : files.filter(file -> file.toString().endsWith(".cbl") || file.toString().endsWith(".CBL"))
+                    .collect(Collectors.toList())) {
+                int tokens = calculateTokensForFile(cobolFile);
+                if(tokens<120000){
+                    arquivoDona++;
+                }
+                contatorArquivo++;
+                mediaTotal = mediaTotal + tokens;
+                System.out.println("Arquivo: " + cobolFile.getFileName() + " - Tokens estimados: " + tokens);
+            }
+            System.out.println("Arquivos com menos de 120000 tokens: " + arquivoDona);
+            mediaTotal = mediaTotal / contatorArquivo;
+            System.out.println("Média de tokens usados: " + mediaTotal);
+        }
+    }
+
+    private int calculateTokensForFile(Path cobolFilePath) throws IOException {
+        StringBuilder content = new StringBuilder();
+        // Lê o conteúdo do arquivo COBOL
+        try (BufferedReader reader = Files.newBufferedReader(cobolFilePath, java.nio.charset.StandardCharsets.ISO_8859_1)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Ignorar comentários no COBOL
+//                if (line.length() > 6 && line.charAt(6) == '*') {
+//                    continue;
+//                }
+                content.append(line).append(System.lineSeparator());
+            }
+        }
+        // Calcula o número de caracteres
+        int characterCount = content.length();
+        // Calcula o número de tokens (estimativa: 4 caracteres por token)
+        return characterCount / 4;
+    }
+
 }
