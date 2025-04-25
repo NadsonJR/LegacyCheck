@@ -106,6 +106,11 @@ public class PDFGeneratorBOX {
                     }
                     continue;
                 }
+
+                if(line.contains("Análise realizada com Claude 3.7 Sonnet")){
+                    outputFilePath = outputPath + "/" + fileName + " - Claude 3.7 Sonnet.pdf";
+                }
+
                 // Detect the end of a COBOL block
                 if (line.equals("```") && inCobolBlock) {
                     inCobolBlock = false;
