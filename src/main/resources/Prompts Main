@@ -1,27 +1,14 @@
-Você é um especialista de Cobol com conhecimento em COBOL VSAM e DB2 Oracle, 
-que acabou de entrar em um novo projeto, agora eu preciso que realize uma análise de um código para entendimento do projeto,
-quero uma explicação profunda de como esse arquivo funciona e o que faz para contextualizar o projeto e gerar uma documentação de referencia
-
 Você é um especialista de Cobol com conhecimento em COBOL VSAM e DB2 Oracle,
-que acabou de entrar em um novo projeto, agora eu preciso que realize uma análise do arquivo FSCN000001.FTB.CBL para entendimento do projeto,
+que acabou de entrar em um novo projeto, agora eu preciso que realize uma análise do arquivo FSTI000100.FTB.CBL para entendimento do projeto,
 quero uma explicação profunda de como esse arquivo funciona e o que faz para contextualizar o projeto e gerar uma documentação de referencia
 
 Agora eu preciso que você faça uma análise de um arquivo COBOL, 
 o contexto é uma migração de VSAM para utilizar DB2 Oracle com SQL
 Na sua analise sempre escreva no começo: Code Review e Análise de Erros no Arquivo "Nome do Arquivo" e qual modelo de IA foi usado e abaixo adicione uma introdução do que está sendo analisado, após isso, 
-1- Realize um code-review do arquivo FSCN000001.FTB.CBL
-2- Encontre erros nas linhas onde encontra-se a marcação da Eccox no arquivo FSCN000001.FTB.CBL e me indique linha a linha onde acontece
-  2.1 Preciso que procure por coisas como redundancia ou erro de lógica ou qualquer outro erro que possa afetar o funcionamento do código,
+
+1- Realize um code-review do arquivo FSTI000100.FTB.CBL
+2- Encontre erros nas linhas onde encontra-se a marcação da Eccox no arquivo FSTI000100.FTB.CBL e me indique linha a linha onde acontece
+2.1 Preciso que procure por coisas como redundancia ou erro de lógica ou qualquer outro erro que possa afetar o funcionamento do código,
 3- Verifique se o código implementado pela Eccox tem coerencia com a linguagem COBOL/VSAM/Db2 Oracle. 
 4- Não quero boas praticas de código, estou procurando por erros que afetam diretamente o funcionamento da aplicação
 5- ignore codigos comentados, levando somente os que realmente estão atuando na aplicação, outro ponto é, para cada erro encontrado promova uma solução valida
-
-
-Você é um especialista de Cobol com conhecimento em COBOL VSAM e DB2 Oracle, que acabou de entrar em um novo projeto
-esse arquivo ainda não está finalizado, ainda está em desenvolvimento, realize um code review desse arquivo
-1- Realize um code-review do arquivo FRPC000210.FTB_1.CBL
-2- Encontre erros nas linhas onde encontra-se a marcação da Eccox no arquivo FRPC000210.FTB_1.CBL e me indique linha a linha onde acontece
-  2.1 Preciso que procure por coisas como redundancia ou erro de lógica ou qualquer outro erro que possa afetar o funcionamento do código,
-3- Verifique se o código implementado pela Eccox tem coerencia com a linguagem COBOL/VSAM/Db2 Oracle. 
-4- Não quero boas praticas de código, estou procurando por erros que afetam diretamente o funcionamento da aplicação
-5- ignore codigos comentandos, levando somente os que realmente estão atuando na aplicação, outro ponto é, para cada erro encontrado promova uma solução valida pensando em longevidade

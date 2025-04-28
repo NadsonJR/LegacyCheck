@@ -13,8 +13,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        //CobolFileReader reader = new CobolFileReader();
-        //CobolToTxtWriter writer = new CobolToTxtWriter(reader);
+        CobolFileReader reader = new CobolFileReader();
+        CobolToTxtWriter writer = new CobolToTxtWriter(reader);
         // Desativa a validação SSL
         //SSLUtils.disableSSLValidation();
 
@@ -23,7 +23,7 @@ public class Main {
         //cobolHandler cobolHandler = new cobolHandler();
         //cobolHandler.splitCobolFilesV3(BaseConfig.OutputCobolSplitFiles, files, 4800);
 
-        //writer.createEmptyTxtForCobolFiles(BaseConfig.Path_TO_COBOL_FILES, BaseConfig.TxtPath);
+        writer.createEmptyTxtForCobolFiles(BaseConfig.Path_TO_COBOL_FILES, BaseConfig.TxtPath);
         // Lê os arquivos TXT do diretório especificado
         List<Path> txtFiles = new TxtFileReader().getTxtFiles(BaseConfig.TxtPath);
 

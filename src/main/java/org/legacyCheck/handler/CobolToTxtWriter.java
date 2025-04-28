@@ -36,10 +36,14 @@ public class CobolToTxtWriter {
                 }
                 Path txtFilePath = Path.of(outputDirectory, txtFileName);
 
+                // Verifica se o arquivo já existe antes de criar
+                if (Files.exists(txtFilePath)) {
+                    System.out.println("Arquivo já existe, ignorando: " + txtFilePath);
+                    continue;
+                }
                 // Cria o arquivo .txt vazio
                 Files.createDirectories(txtFilePath.getParent()); // Garante que o diretório de saída exista
                 Files.createFile(txtFilePath);
-
                 System.out.println("Arquivo criado: " + txtFilePath);
             }
         } catch (IOException e) {
